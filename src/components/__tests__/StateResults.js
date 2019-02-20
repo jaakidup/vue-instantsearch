@@ -6,9 +6,12 @@ jest.mock('../../mixins/widget');
 it('renders explanation if no slot is used', () => {
   __setState({
     results: {
-      query: 'q',
+      query: 'this is the quer',
       hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
       page: 1,
+    },
+    state: {
+      query: 'this is the query',
     },
   });
   const wrapper = mount(StateResults);
@@ -21,31 +24,85 @@ it("doesn't render if no results", () => {
   expect(wrapper.html()).toBeUndefined();
 });
 
-it('gives results to default slot', () => {
+it('gives state & results to default slot', () => {
   const results = {
     query: 'q',
     hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
     page: 1,
   };
+  const state = {
+    query: 'something',
+    disjunctiveFacetsRefinements: {},
+    page: 1,
+  };
 
   __setState({
+    state,
     results,
   });
 
   mount(StateResults, {
     scopedSlots: {
-      default: props => expect(props).toEqual(results),
+      default: props => {
+        expect(props).toEqual(expect.objectContaining(results));
+        expect(props.results).toEqual(results);
+        expect(props.state).toEqual(state);
+      },
     },
   });
+});
+
+it('allows default slot to render whatever they want (modern scope)', () => {
+  const results = {
+    query: 'hi',
+    hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
+    page: 1,
+  };
+  const state = {
+    query: 'hi!',
+  };
+  __setState({
+    state,
+    results,
+  });
+
+  const wrapper = mount(StateResults, {
+    scopedSlots: {
+      default: `
+      <template slot-scope="{ state: { query } }">
+        <p v-if="query">
+          Query is here
+        </p>
+        <p v-else>
+          There's no query
+        </p>
+      </template>`,
+    },
+  });
+
+  expect(wrapper.html()).toMatchInlineSnapshot(`
+
+<div class="ais-StateResults">
+  <p>
+    Query is here
+  </p>
+</div>
+
+`);
 });
 
 it('allows default slot to render whatever they want (truthy query)', () => {
+  const results = {
+    query: 'hi',
+    hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
+    page: 1,
+  };
+  const state = {
+    query: 'hi!',
+  };
   __setState({
-    results: {
-      query: 'q',
-      hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
-      page: 1,
-    },
+    state,
+    results,
   });
 
   const wrapper = mount(StateResults, {
@@ -62,16 +119,29 @@ it('allows default slot to render whatever they want (truthy query)', () => {
     },
   });
 
-  expect(wrapper.html()).toMatchSnapshot();
+  expect(wrapper.html()).toMatchInlineSnapshot(`
+
+<div class="ais-StateResults">
+  <p>
+    Query is here
+  </p>
+</div>
+
+`);
 });
 
 it('allows default slot to render whatever they want (falsy query)', () => {
+  const results = {
+    query: '',
+    hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
+    page: 1,
+  };
+  const state = {
+    query: 'hi!',
+  };
   __setState({
-    results: {
-      query: '',
-      hits: [{ objectID: '1', name: 'one' }, { objectID: '2', name: 'two' }],
-      page: 1,
-    },
+    state,
+    results,
   });
 
   const wrapper = mount(StateResults, {
@@ -88,5 +158,13 @@ it('allows default slot to render whatever they want (falsy query)', () => {
     },
   });
 
-  expect(wrapper.html()).toMatchSnapshot();
+  expect(wrapper.html()).toMatchInlineSnapshot(`
+
+<div class="ais-StateResults">
+  <p>
+    There's no query
+  </p>
+</div>
+
+`);
 });
