@@ -62,12 +62,11 @@ export default {
   ],
   computed: {
     stateResults() {
-      return Object.assign(
-        {},
-        // TODO: remove this spreading in the next major version
-        this.state.results,
-        { results: this.state.results, state: this.state.state }
-      );
+      // TODO: just pass results & state separately in the next major version
+      const stateResults = this.state.results;
+      stateResults.results = this.state.results;
+      stateResults.state = this.state.state;
+      return stateResults;
     }
   }
 };
