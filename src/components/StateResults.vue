@@ -1,15 +1,6 @@
 <template>
   <div :class="suit()" v-if="state && state.results">
-    <slot
-      v-bind="
-        Object.assign(
-          {},
-          // TODO: remove this spreading in the next major version
-          state.results,
-          { results: state.results, state: state.state }
-        )
-      "
-    >
+    <slot v-bind="stateResults">
       <p>
         Use this component to have a different layout based on a certain state.
       </p>
@@ -68,6 +59,16 @@ export default {
   mixins: [
     createWidgetMixin({ connector: connectStateResults }),
     createSuitMixin({ name: "StateResults" })
-  ]
+  ],
+  computed: {
+    stateResults() {
+      return Object.assign(
+        {},
+        // TODO: remove this spreading in the next major version
+        this.state.results,
+        { results: this.state.results, state: this.state.state }
+      );
+    }
+  }
 };
 </script>
