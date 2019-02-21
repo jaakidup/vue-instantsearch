@@ -1,5 +1,8 @@
 <template>
-  <div :class="suit()" v-if="state && state.results">
+  <div
+    :class="suit()"
+    v-if="state && state.results"
+  >
     <slot v-bind="stateResults">
       <p>
         Use this component to have a different layout based on a certain state.
@@ -15,8 +18,8 @@
 </template>
 
 <script>
-import { createSuitMixin } from "../mixins/suit";
-import { createWidgetMixin } from "../mixins/widget";
+import { createSuitMixin } from '../mixins/suit';
+import { createWidgetMixin } from '../mixins/widget';
 
 const connectStateResults = (renderFn, unmountFn) => (widgetParams = {}) => ({
   init({ instantSearchInstance }) {
@@ -25,7 +28,7 @@ const connectStateResults = (renderFn, unmountFn) => (widgetParams = {}) => ({
         state: undefined,
         results: undefined,
         instantSearchInstance,
-        widgetParams
+        widgetParams,
       },
       true
     );
@@ -43,7 +46,7 @@ const connectStateResults = (renderFn, unmountFn) => (widgetParams = {}) => ({
         results: resultsCopy,
         state: stateCopy,
         instantSearchInstance,
-        widgetParams
+        widgetParams,
       },
       false
     );
@@ -51,14 +54,14 @@ const connectStateResults = (renderFn, unmountFn) => (widgetParams = {}) => ({
 
   dispose() {
     unmountFn();
-  }
+  },
 });
 
 export default {
-  name: "AisStateResults",
+  name: 'AisStateResults',
   mixins: [
     createWidgetMixin({ connector: connectStateResults }),
-    createSuitMixin({ name: "StateResults" })
+    createSuitMixin({ name: 'StateResults' }),
   ],
   computed: {
     stateResults() {
@@ -67,7 +70,7 @@ export default {
       stateResults.results = this.state.results;
       stateResults.state = this.state.state;
       return stateResults;
-    }
-  }
+    },
+  },
 };
 </script>
